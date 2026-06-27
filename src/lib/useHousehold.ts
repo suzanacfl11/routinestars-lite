@@ -60,6 +60,12 @@ export function useHousehold() {
     if (activeId === id) setActiveId(remaining[0].id);
   };
 
+  const renameProfile = (id: number, newName: string) => {
+    const trimmed = newName.trim();
+    if (!trimmed) return;
+    setProfiles((ps) => ps.map((p) => (p.id === id ? { ...p, name: trimmed } : p)));
+  };
+
   const handleEarnStars = (count: number, routineType: RoutineType) => {
     const today = todayStr();
     let milestone: number | null = null;
@@ -113,6 +119,7 @@ export function useHousehold() {
     updateProfile,
     addProfile,
     deleteProfile,
+    renameProfile,
     handleEarnStars,
     handleRedeem,
     redeemSplash,

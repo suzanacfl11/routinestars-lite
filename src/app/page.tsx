@@ -30,6 +30,7 @@ export default function Home() {
     updateProfile,
     addProfile,
     deleteProfile,
+    renameProfile,
     handleEarnStars,
     handleRedeem,
     redeemSplash,
@@ -50,7 +51,7 @@ export default function Home() {
     <div style={{ minHeight: "100vh", background: BG }}>
       <div style={{ background: `linear-gradient(135deg,${ACCENT},${ACCENT2})`, padding: "16px 16px 14px" }}>
         <div style={{ marginBottom: 12 }}>
-          <ProfileBar profiles={profiles} activeId={activeId} onSwitch={setActiveId} onAdd={addProfile} onDelete={deleteProfile} />
+          <ProfileBar profiles={profiles} activeId={activeId} onSwitch={setActiveId} onAdd={addProfile} onDelete={deleteProfile} onRename={renameProfile} />
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
           <StarLogo size={38} />

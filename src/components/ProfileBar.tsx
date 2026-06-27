@@ -10,16 +10,21 @@ export function ProfileBar({
   onSwitch,
   onAdd,
   onDelete,
+  onRename,
 }: {
   profiles: Profile[];
   activeId: number;
   onSwitch: (id: number) => void;
   onAdd: (name: string, avatar: string) => void;
   onDelete: (id: number) => void;
+  onRename: (id: number, newName: string) => void;
 }) {
   const [adding, setAdding] = useState(false);
   const [name, setName] = useState("");
   const [avatar, setAvatar] = useState(AVATAR_PICKS[0]);
+
+  const [renamingId, setRenamingId] = useState<number | null>(null);
+  const [renameValue, setRenameValue] = useState("");
 
   const submit = () => {
     if (!name.trim()) return;
@@ -29,44 +34,102 @@ export function ProfileBar({
     setAdding(false);
   };
 
+  const startRename = (p: Profile) => {
+    setRenamingId(p.id);
+    setRenameValue(p.name);
+  };
+  const submitRename = () => {
+    if (renamingId !== null) onRename(renamingId, renameValue);
+    setRenamingId(null);
+  };
+
   return (
     <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 2 }}>
-      {profiles.map((p) => (
-        <button
-          key={p.id}
-          onClick={() => onSwitch(p.id)}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 7,
-            padding: "7px 14px 7px 7px",
-            borderRadius: 50,
-            border: "none",
-            background: p.id === activeId ? "#fff" : "rgba(255,255,255,0.18)",
-            color: p.id === activeId ? TEXT : "#fff",
-            fontWeight: 800,
-            fontSize: 13,
-            cursor: "pointer",
-            flexShrink: 0,
-          }}
-        >
+      {profiles.map((p) => {
+        const isRenaming = renamingId === p.id;
+
+        if (isRenaming) {
+          return (
+            <div key={p.id} style={{ display: "flex", alignItems: "center", gap: 6, background: "#fff", borderRadius: 50, padding: "5px 8px", flexShrink: 0 }}>
+              <div style={{ width: 26, height: 26, borderRadius: "50%", background: CARD, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, flexShrink: 0 }}>
+                {p.avatar}
+              </div>
+              <input
+                autoFocus
+                value={renameValue}
+                onChange={(e) => setRenameValue(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && submitRename()}
+                onFocus={(e) => e.target.select()}
+                style={{ width: 80, border: "none", outline: "none", fontSize: 13, fontWeight: 700, color: TEXT }}
+              />
+              <button onClick={submitRename} style={{ width: 26, height: 26, borderRadius: "50%", border: "none", background: "#1FA98C", color: "#fff", fontWeight: 800, cursor: "pointer", flexShrink: 0 }}>
+                ✓
+              </button>
+              <button onClick={() => setRenamingId(null)} style={{ width: 26, height: 26, borderRadius: "50%", border: "none", background: CARD, color: SUB, fontWeight: 800, cursor: "pointer", flexShrink: 0 }}>
+                ✕
+              </button>
+            </div>
+          );
+        }
+
+        return (
           <div
+            key={p.id}
             style={{
-              width: 26,
-              height: 26,
-              borderRadius: "50%",
-              background: p.id === activeId ? CARD : "rgba(255,255,255,0.25)",
               display: "flex",
               alignItems: "center",
-              justifyContent: "center",
-              fontSize: 15,
+              gap: 2,
+              borderRadius: 50,
+              background: p.id === activeId ? "#fff" : "rgba(255,255,255,0.18)",
+              flexShrink: 0,
+              paddingRight: p.id === activeId ? 4 : 0,
             }}
           >
-            {p.avatar}
+            <button
+              onClick={() => onSwitch(p.id)}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 7,
+                padding: "7px 10px 7px 7px",
+                borderRadius: 50,
+                border: "none",
+                background: "transparent",
+                color: p.id === activeId ? TEXT : "#fff",
+                fontWeight: 800,
+                fontSize: 13,
+                cursor: "pointer",
+                flexShrink: 0,
+              }}
+            >
+              <div
+                style={{
+                  width: 26,
+                  height: 26,
+                  borderRadius: "50%",
+                  background: p.id === activeId ? CARD : "rgba(255,255,255,0.25)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: 15,
+                }}
+              >
+                {p.avatar}
+              </div>
+              {p.name}
+            </button>
+            {p.id === activeId && (
+              <button
+                onClick={() => startRename(p)}
+                title="Rename"
+                style={{ width: 22, height: 22, borderRadius: "50%", border: "none", background: "transparent", color: SUB, fontSize: 12, cursor: "pointer", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}
+              >
+                ✎
+              </button>
+            )}
           </div>
-          {p.name}
-        </button>
-      ))}
+        );
+      })}
 
       {!adding && profiles.length < MAX_PROFILES && (
         <button
