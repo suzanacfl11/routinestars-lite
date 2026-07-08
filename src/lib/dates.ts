@@ -12,23 +12,17 @@ export const toLabel = (mins: number): string => {
   return `${h12}:${m.toString().padStart(2, "0")} ${ampm}`;
 };
 
-// IMPORTANT: uses the LOCAL calendar date, not UTC. Date.toISOString() would
-// shift the date for anyone not near UTC (e.g. a 7pm Pacific bedtime routine
-// would log as "tomorrow" in UTC), corrupting streaks right at the day
-// boundary for most of this app's audience.
+// Uses LOCAL calendar date — NOT UTC. toISOString() shifts the date for
+// anyone not near UTC, corrupting streaks for users in US/Canada time zones.
 export const todayStr = (): string => {
   const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
-    d.getDate()
-  ).padStart(2, "0")}`;
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 };
 
 export const yesterdayStr = (): string => {
   const d = new Date();
   d.setDate(d.getDate() - 1);
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
-    d.getDate()
-  ).padStart(2, "0")}`;
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 };
 
 export const daysBetween = (a: string, b: string): number => {

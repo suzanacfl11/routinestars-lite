@@ -9,13 +9,13 @@ import { trackProfileAdded, trackRewardRedeemed, trackRoutineCompleted, trackStr
 import type { Profile, Reward, RoutineType } from "./types";
 
 export function useHousehold() {
-  const [loaded, setLoaded] = useState(false);
+  const [loaded, setLoaded]   = useState(false);
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [activeId, setActiveId] = useState<number | null>(null);
   const householdIdRef = useRef<string>("");
 
-  const [redeemSplash, setRedeemSplash] = useState<Reward | null>(null);
-  const [streakMilestone, setStreakMilestone] = useState<number | null>(null);
+  const [redeemSplash,    setRedeemSplash]    = useState<Reward | null>(null);
+  const [streakMilestone, setStreakMilestone]  = useState<number | null>(null);
 
   useEffect(() => {
     loadHousehold().then(({ data, householdId }) => {
@@ -45,11 +45,7 @@ export function useHousehold() {
   const addProfile = (name: string, avatar: string) => {
     if (profiles.length >= MAX_PROFILES) return;
     const np = defaultProfile(name, avatar);
-    setProfiles((ps) => {
-      const next = [...ps, np];
-      trackProfileAdded(next.length);
-      return next;
-    });
+    setProfiles((ps) => { const next = [...ps, np]; trackProfileAdded(next.length); return next; });
     setActiveId(np.id);
   };
 
@@ -70,38 +66,28 @@ export function useHousehold() {
     const today = todayStr();
     let milestone: number | null = null;
     updateProfile((p) => {
-      const completedToday = p.lastCompletedDate === today ? [...new Set([...p.completedToday, routineType])] : [routineType];
-      let streak = p.streak;
-      let missedDays = p.missedDays;
-      let bestStreak = p.bestStreak || 0;
+      const completedToday =
+        p.lastCompletedDate === today
+          ? [...new Set([...p.completedToday, routineType])]
+          : [routineType];
+      let streak = p.streak, missedDays = p.missedDays, bestStreak = p.bestStreak || 0;
       if (p.lastCompletedDate !== today) {
         const gap = p.lastCompletedDate ? daysBetween(p.lastCompletedDate, today) : null;
-        if (gap === 1) {
-          streak = p.streak + 1;
-        } else if (gap !== null && gap > 1) {
-          missedDays += gap - 1; // every day strictly between last completion and today was missed
-          streak = 1;
-        } else {
-          streak = 1; // first-ever completion
-        }
+        if (gap === 1)                        { streak = p.streak + 1; }
+        else if (gap !== null && gap > 1)     { missedDays += gap - 1; streak = 1; }
+        else                                  { streak = 1; }
         bestStreak = Math.max(bestStreak, streak);
-        if (streak >= STREAK_CAP) {
-          milestone = streak;
-          streak = 0; // roll over after hitting the cap
-        }
+        if (streak >= STREAK_CAP) { milestone = streak; streak = 0; }
       }
       return { ...p, stars: p.stars + count, lastCompletedDate: today, completedToday, streak, bestStreak, missedDays };
     });
     trackRoutineCompleted(routineType, count);
-    if (milestone) {
-      trackStreakMilestone(milestone);
-      setStreakMilestone(milestone);
-    }
+    if (milestone) { trackStreakMilestone(milestone); setStreakMilestone(milestone); }
   };
 
   const handleRedeem = (reward: Reward) => {
     updateProfile((p) => {
-      if (p.stars < reward.cost) return p; // guards against double-tap firing before re-render
+      if (p.stars < reward.cost) return p;
       return { ...p, stars: Math.max(0, p.stars - reward.cost) };
     });
     trackRewardRedeemed(reward.cost);
@@ -111,20 +97,10 @@ export function useHousehold() {
   const activeProfile = profiles.find((p) => p.id === activeId) || null;
 
   return {
-    loaded,
-    profiles,
-    activeId,
-    activeProfile,
-    setActiveId,
-    updateProfile,
-    addProfile,
-    deleteProfile,
-    renameProfile,
-    handleEarnStars,
-    handleRedeem,
-    redeemSplash,
-    setRedeemSplash,
-    streakMilestone,
-    setStreakMilestone,
+    loaded, profiles, activeId, activeProfile,
+    setActiveId, updateProfile, addProfile, deleteProfile, renameProfile,
+    handleEarnStars, handleRedeem,
+    redeemSplash, setRedeemSplash,
+    streakMilestone, setStreakMilestone,
   };
 }

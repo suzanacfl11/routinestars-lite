@@ -2,15 +2,15 @@ export type RoutineType = "morning" | "bedtime" | "chores";
 
 export interface Task {
   id: number;
-  e: string; // currently selected emoji
-  n: string; // task name
-  m: number; // minutes
-  iconSet?: string[]; // alternate emoji options to cycle through
+  e: string;
+  n: string;
+  m: number;
+  iconSet?: string[];
 }
 
 export interface Routine {
-  start: string; // "HH:MM"
-  end: string; // "HH:MM"
+  start: string;
+  end: string;
   tasks: Task[];
 }
 
@@ -33,7 +33,7 @@ export interface Profile {
   streak: number;
   bestStreak: number;
   missedDays: number;
-  lastCompletedDate: string | null; // YYYY-MM-DD, local calendar date
+  lastCompletedDate: string | null;
   completedToday: RoutineType[];
 }
 
